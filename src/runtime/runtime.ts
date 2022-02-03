@@ -1,7 +1,7 @@
-import { mkdtemp, readFile, writeFile, stat, access } from 'fs/promises';
+import { mkdtemp, readFile, writeFile, rmdir, access } from 'fs/promises';
 import { join } from 'path';
 import { tmpdir } from 'os';
-import { DenoRunConfig, runScriptWithDeno } from './deno';
+import { DenoRunConfig, runScriptWithDeno, validateScriptForDeno } from './deno';
 
 const SCRIPT_NAME = 'script.ts';
 const RENDERED_OUTPUT_NAME = 'rendered_output';
@@ -37,6 +37,25 @@ export async function runScriptOnRuntime(scriptContent: string): Promise<string>
   const output = await readFile(outputPath);
   return output.toString('utf-8');
 }
+
+export interface ScriptValidationResult {
+  ok: boolean;
+  errorsFound?: string;
+}
+
+export async function validateScriptForRuntime(scriptContent: string): Promise<ScriptValidationResult> {
+  const workingDirectory = await mkdtemp(TEMP_PREFIX);
+  const scriptPath = join(workingDirectory, SCRIPT_NAME);
+  await writeFile(scriptPath, scriptContent);
+
+  const { ok, errorsFound } = await validateScriptForDeno(scriptPath);
+  await rmdir(workingDirectory);
+  return {
+    ok,
+    errorsFound,
+  };
+}
+
 
 const checkExists = (path: string): Promise<boolean> =>
   access(path)

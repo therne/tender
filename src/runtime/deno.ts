@@ -65,4 +65,23 @@ export async function runScriptWithDeno(
   }
 }
 
+export interface DenoScriptValidateResult {
+  ok: boolean;
+  errorsFound?: string;
+}
+
+export async function validateScriptForDeno(scriptPath: string): Promise<DenoScriptValidateResult> {
+  const cmd = `deno lint ${scriptPath}'`;
+  try {
+    await execAsync(cmd);
+    return { ok: true };
+  } catch (err) {
+    const {code, stderr} = err as (ExecException & { stderr?: string });
+    if (code === 1 && typeof stderr === 'string') {
+      return { ok: false, errorsFound: stderr };
+    }
+    throw err;
+  }
+}
+
 const commaList = (list?: string[]) => (list ?? []).join(',');

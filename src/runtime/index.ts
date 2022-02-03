@@ -1,1 +1,1 @@
-export { runScriptOnRuntime } from './runtime';
+export * from './runtime';
