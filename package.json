@@ -16,6 +16,7 @@
   "private": true,
   "devDependencies": {
     "@tsconfig/node14": "^1.0.1",
+    "@types/jest": "^27.4.0",
     "@types/koa": "^2.13.4",
     "@types/koa-bodyparser": "^4.3.5",
     "@types/koa-json": "^2.0.20",
