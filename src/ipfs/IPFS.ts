@@ -1,6 +1,6 @@
 import pinataClient, { PinataClient } from '@pinata/sdk';
-import { basename } from 'path';
 import fetch from 'node-fetch';
+import { randomBytes } from 'crypto';
 
 // uses pinata cloud as a gateway
 const IPFS_GATEWAY_URL = 'https://gateway.pinata.cloud/ipfs';
@@ -31,14 +31,14 @@ export class IPFS {
   }
 
   /**
-   * Pins a local file to IPFS.
+   * Pins a data to IPFS.
    *
-   * @param filePath A local file path
+   * @param data A data
    * @returns the CID of pinned file.
    */
-  async write(filePath: string): Promise<string> {
-    const name = `tender-${basename(filePath)}`;
-    const { IpfsHash: cid } = await this.pinata.pinFromFS(filePath, { pinataMetadata: { name } });
+  async write(data: string): Promise<string> {
+    const name = `tender-${randomBytes(8).toString('hex')}.ts`;
+    const { IpfsHash: cid } = await this.pinata.pinFileToIPFS(data, { pinataMetadata: { name } });
     return cid;
   }
 }
