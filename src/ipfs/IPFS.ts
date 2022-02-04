@@ -1,6 +1,7 @@
 import pinataClient, { PinataClient } from '@pinata/sdk';
 import fetch from 'node-fetch';
 import { randomBytes } from 'crypto';
+import { CIDNotFound } from './errors';
 
 // uses pinata cloud as a gateway
 const IPFS_GATEWAY_URL = 'https://gateway.pinata.cloud/ipfs';
@@ -27,6 +28,9 @@ export class IPFS {
    */
   async read(cid: string): Promise<string> {
     const response = await fetch(this.urlOf(cid));
+    if (!response.ok) {
+      throw new CIDNotFound(cid);
+    }
     return response.text();
   }
 
