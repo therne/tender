@@ -31,14 +31,14 @@ export class IPFS {
   }
 
   /**
-   * Pins a data to IPFS.
+   * Pins a local file to IPFS.
    *
-   * @param data A data
+   * @param filePath A file path
    * @returns the CID of pinned file.
    */
-  async write(data: string): Promise<string> {
+  async write(filePath: string): Promise<string> {
     const name = `tender-${randomBytes(8).toString('hex')}.ts`;
-    const { IpfsHash: cid } = await this.pinata.pinFileToIPFS(data, { pinataMetadata: { name } });
+    const { IpfsHash: cid } = await this.pinata.pinFromFS(filePath, { pinataMetadata: { name } });
     return cid;
   }
 }

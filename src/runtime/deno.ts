@@ -52,12 +52,12 @@ export async function runScriptWithDeno(
       elapsedMs: Date.now() - startedAt,
     };
   } catch (err) {
-    const { code, stderr } = err as (ExecException & { stderr?: string });
+    const { code, stderr } = err as ExecException & { stderr?: string };
     if (code === 1 && typeof stderr === 'string') {
       if (stderr.includes('Uncaught PermissionDenied')) {
         throw new PermissionError(stderr);
       }
-      if (stderr.includes('The module\'s source code could not be parsed')) {
+      if (stderr.includes("The module's source code could not be parsed")) {
         throw new ScriptSyntaxError(stderr);
       }
     }
@@ -71,12 +71,12 @@ export interface DenoScriptValidateResult {
 }
 
 export async function validateScriptForDeno(scriptPath: string): Promise<DenoScriptValidateResult> {
-  const cmd = `deno lint ${scriptPath}'`;
+  const cmd = `cp ${scriptPath} ${scriptPath}.ts && deno lint --json ${scriptPath}.ts`;
   try {
     await execAsync(cmd);
     return { ok: true };
   } catch (err) {
-    const {code, stderr} = err as (ExecException & { stderr?: string });
+    const { code, stderr } = err as ExecException & { stderr?: string };
     if (code === 1 && typeof stderr === 'string') {
       return { ok: false, errorsFound: stderr };
     }

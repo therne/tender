@@ -15,10 +15,10 @@ export interface DeployResult {
 }
 
 /**
- * Uploads given script to IPFS.
+ * Uploads given script file to IPFS.
  */
-export async function deploy(ipfs: IPFS, scriptContent: string): Promise<DeployResult> {
-  const { ok, errorsFound } = await validateScriptForRuntime(scriptContent);
+export async function deploy(ipfs: IPFS, localFile: string): Promise<DeployResult> {
+  const { ok, errorsFound } = await validateScriptForRuntime(localFile);
   if (!ok && errorsFound) {
     return {
       error: {
@@ -27,7 +27,7 @@ export async function deploy(ipfs: IPFS, scriptContent: string): Promise<DeployR
       },
     };
   }
-  const cid = await ipfs.write(scriptContent);
+  const cid = await ipfs.write(localFile);
   return {
     result: {
       cid,

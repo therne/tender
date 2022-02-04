@@ -1,4 +1,4 @@
-import { mkdtemp, readFile, writeFile, rmdir, access } from 'fs/promises';
+import { access, mkdtemp, readFile, writeFile } from 'fs/promises';
 import { join } from 'path';
 import { tmpdir } from 'os';
 import { DenoRunConfig, runScriptWithDeno, validateScriptForDeno } from './deno';
@@ -27,7 +27,9 @@ export async function runScriptOnRuntime(scriptContent: string): Promise<string>
     allowedFilesToWrite: [RENDERED_OUTPUT_NAME],
   };
   const { stdout, stderr, elapsedMs } = await runScriptWithDeno(scriptPath, input, config);
-  console.log(`Run ${scriptPath}:\n  stdout: ${stdout}\n  stderr: ${stderr}\n  elapsed ${(elapsedMs / 1000).toFixed(2)}s`);
+  console.log(
+    `Run ${scriptPath}:\n  stdout: ${stdout}\n  stderr: ${stderr}\n  elapsed ${(elapsedMs / 1000).toFixed(2)}s`,
+  );
 
   // rendered contents are written on outputPath
   const outputExists = await checkExists(outputPath);
@@ -43,19 +45,13 @@ export interface ScriptValidationResult {
   errorsFound?: string;
 }
 
-export async function validateScriptForRuntime(scriptContent: string): Promise<ScriptValidationResult> {
-  const workingDirectory = await mkdtemp(TEMP_PREFIX);
-  const scriptPath = join(workingDirectory, SCRIPT_NAME);
-  await writeFile(scriptPath, scriptContent);
-
+export async function validateScriptForRuntime(scriptPath: string): Promise<ScriptValidationResult> {
   const { ok, errorsFound } = await validateScriptForDeno(scriptPath);
-  await rmdir(workingDirectory);
   return {
     ok,
     errorsFound,
   };
 }
-
 
 const checkExists = (path: string): Promise<boolean> =>
   access(path)
